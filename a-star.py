@@ -114,6 +114,26 @@ def astar(start_state, goal_p, successors, cost_fn, remaining_cost_fn):
 
 # The rest of the code for testing and other purposes would go here
 
+'''
+Content Integer ASCII
+Blank       0  ‘ ‘  (space)
+Wall        1  ‘#’
+Box         2  ‘$’
+Keeper      3  ‘@’
+Goal        4  ‘.’
+Box/goal    5  ‘*’
+Keeper/goal 6  ‘+’
+'''
+
+class square:
+    types = ['blank', 'wall', 'box', 'keeper', 'goal', 'box/goal', 'keeper/goal']
+    chars = [' ', '#', '$', '@', '.', '*', '+']
+    def __init__(self, id):
+        self.type = types[id]
+        self.char = chars[id]
+        self.id = id
+
+
 def cost(s1, s2):
     print('cost fun', s1, s2)
     return 1
@@ -126,13 +146,42 @@ def rcost(state):
 
     return r if r > 0 else 0
 
+#h0
+def h0(state):
+    return 0
+
+#h1
+def h1(state):
+    n = 0
+    for l in state:
+        for i in l:
+            if i != 4: n += 1
+    return n
+
+# TODO: implement huristic for A*
+def hUID:(state):
+    pass
+
+
+#goal test #1
 def goal(state):
     print('goal')
     return False
 
+#next-states #2
 def msuccessors(state):
     print('successors', state)
     return MyPath(state).states()
+
+#suggested helper functions
+def getsq(state, r, c):
+    pass
+
+def setsq(state, r, c, v):
+    pass
+
+def trymove(state, dir):
+    pass
 
 
 # data = [None] * 5001
@@ -143,11 +192,13 @@ def msuccessors(state):
 #     print('not')
 # print('data')
 
-s = [(0,0)]
+s = [[0,0,0,0,4]]
 g = ['.']
 # goal = MyPath(g)
 path = MyPath(s)
-astar(path.state, goal, msuccessors, cost, rcost)
+one = h1(path.state)
+print(one)
+# astar(path.state, goal, msuccessors, cost, rcost)
 
 
 
