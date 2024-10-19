@@ -97,6 +97,7 @@ def astar(start_state, goal_p, successors, cost_fn, remaining_cost_fn):
         my_path = open_list.remove()
         state = my_path.state
         new_val = my_path.total_cost
+        print(state, type(state))
         hash_val = closed_list.hash_fn(state)
         closed_val = closed_list.get(state)
         if not closed_val or new_val < closed_val:
@@ -112,3 +113,41 @@ def astar(start_state, goal_p, successors, cost_fn, remaining_cost_fn):
                 open_list.add(MyPath(state2, my_path, cost, total_cost), total_cost)
 
 # The rest of the code for testing and other purposes would go here
+
+def cost(s1, s2):
+    print('cost fun', s1, s2)
+    return 1
+
+r = 90
+def rcost(state):
+    global r
+    print('rcost', state, r)
+    r -= 1
+
+    return r if r > 0 else 0
+
+def goal(state):
+    print('goal')
+    return False
+
+def msuccessors(state):
+    print('successors', state)
+    return MyPath(state).states()
+
+
+# data = [None] * 5001
+# print('test')
+# print(len(data))
+# print(data[0:11])
+# if not data[4]:
+#     print('not')
+# print('data')
+
+s = [(0,0)]
+g = ['.']
+# goal = MyPath(g)
+path = MyPath(s)
+astar(path.state, goal, msuccessors, cost, rcost)
+
+
+
