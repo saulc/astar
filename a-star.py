@@ -129,8 +129,8 @@ class square:
     types = ['blank', 'wall', 'box', 'keeper', 'goal', 'box/goal', 'keeper/goal']
     chars = [' ', '#', '$', '@', '.', '*', '+']
     def __init__(self, id):
-        self.type = types[id]
-        self.char = chars[id]
+        self.type = self.types[id]
+        self.char = self.chars[id]
         self.id = id
 
 
@@ -159,7 +159,7 @@ def h1(state):
     return n
 
 # TODO: implement huristic for A*
-def hUID:(state):
+def hUID(state):
     pass
 
 
@@ -175,14 +175,38 @@ def msuccessors(state):
 
 #suggested helper functions
 def getsq(state, r, c):
-    pass
+    if r >= len(state) or c >= len(state[r]): return 1
+    return state[r][c]
 
 def setsq(state, r, c, v):
-    pass
+    s = state.copy()
+    s[r][c] = v
+    return s
 
 def trymove(state, dir):
-    pass
+     for l in state:
+        for i in l:
+            if i != 4: n += 1
 
+def findme(state):
+    x = -1
+    y = x
+    for i in range(len(state)):
+        for j in range(len(state[i])):
+            c = getsq(state, i, j)
+            if c == 3:
+                return i, j
+
+
+def printState(state, printer=True):
+    p = []
+    for l in state:
+        t = ''
+        for i in l:
+            t += square(i).char + ' '
+        if(printer): print(t)
+        p.append(t)
+    return p
 
 # data = [None] * 5001
 # print('test')
@@ -192,12 +216,20 @@ def trymove(state, dir):
 #     print('not')
 # print('data')
 
-s = [[0,0,0,0,4]]
-g = ['.']
+# s = [[0,0,0,0,4]]
+s = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
+[1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
+[1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
+[1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
+[1 ,0 ,4 ,0 ,4 ,1 ,3 ,0 ,1],
+[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
+
+g = ['.'] 
 # goal = MyPath(g)
 path = MyPath(s)
 one = h1(path.state)
 print(one)
+printState(s)
 # astar(path.state, goal, msuccessors, cost, rcost)
 
 
