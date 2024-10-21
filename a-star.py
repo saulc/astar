@@ -166,18 +166,18 @@ def hUID(state):
 #goal test #1
 def goal(state):
     # print('goal test')
-    #if box/goal > 0 and goal/keeper == 0 and box == goal == 0
-    # and keeper == 1 assuming goals == boxes then gameover! win.
+    #if box/goal > 0 and   goal == 0
+
     a = [0] * 5 
     for l in state:
         for i in l:
             if i == 5: a[0] +=1
-            elif i == 6: a[1] += 1
+            # elif i == 6: a[1] += 1
             elif i == 2: a[2] += 1
-            elif i == 4: a[3] += 1
-            elif i == 3: a[4] += 1
+            # elif i == 4: a[3] += 1
+            elif i == 3 or i == 6: a[4] += 1
     # print(a)
-    return  a[0] > 0 and a[1] == 0 and a[2] == 0 and a[3] == 0 and a[4] == 1
+    return  a[0] > 0 and a[2] == 0 and a[3] == 0 and a[4] == 1
     
 
 #next-states #2
@@ -197,7 +197,7 @@ def msuccessors(state):
 
 #suggested helper functions
 def getsq(state, r, c):
-    if r >= len(state) or c >= len(state[r]): 
+    if r >= len(state) or c >= len(state[r]) or r < 0 or c < 0: 
         print('out of bounds, return wall value')
         return 1
     return state[r][c]
@@ -210,13 +210,15 @@ def setsq(state, r, c, v):
 def trymove(state, dir):
     x, y = findme(state)
     c = checksq(state, dir, x, y)
-    # print('checking: ', x, y, c)
+    print('checking: ', x, y, c)
     if c == 0 or c == 4:
-        return makemove(state, dir, x, y)
+        return makemove(state, dir, x, y, c)
     elif c == 2 or c == 5:
-        if checkpush(state,dir, x, y):
+        p , q = checkpush(state,dir, x, y)
+        print(p, q)
+        if p:
             print('moving box')
-            return push(state, dir, x, y, c)
+            return push(state, dir, x, y, c, q)
     return None
 
 def checksq(state, dir, x, y): 
@@ -224,58 +226,103 @@ def checksq(state, dir, x, y):
     a = x
     b = y
     # print(type(dir))
-    if dir == 0: b += 1
-    elif dir == 1: a += 1
-    elif dir == 2: b -= 1
-    elif dir == 3: a -= 1
+    if dir == 0: 
+        b += 1
+        print('down')
+    elif dir == 1: 
+        a += 1
+        print('right')
+    elif dir == 2: 
+        b -= 1
+        print('up')
+    elif dir == 3: 
+        a -= 1
+        print('left')
     else: print('direction invalid')
     print('checking: ', a, b)
     return getsq(state, a, b)
 
 def checkpush(state, dir, x, y): 
     # check the other side of the box
-    if dir == 0: y += 2
-    elif dir == 1: x += 2
-    elif dir == 2: y -= 2
-    elif dir == 3: x -= 2
-    q = getsq(state, x,y) 
-    print('checkpush', q==0)
+    a = x
+    b = y 
+    if dir == 0: b += 2
+    elif dir == 1: a += 2
+    elif dir == 2: b -= 2
+    elif dir == 3: a -= 2
+    q = getsq(state, a,b) 
+    print('checkpush', q)
     # only push a box if the space is empty or a goal.
-    return q == 0 or q == 4
+    return q == 0 or q == 4 , q
 
-def push(state, dir, x, y, c):
+def push(state, dir, x, y, c, q):
+    # moving a box actually has alot of weird cases to deal with
     s = None 
+    b = 3
+    m = getsq(state, x, y)
+    if c == 5: 
+        b = 6
+        if m == 3: c = 0
+        elif m == 5: c = 4
+    elif c == 6: c = 4
+    else: c = 0
+
+
+    if m == 6: 
+        # q = 0
+        b = 6 if b == 4 else 3
+        c = 4
+
+    if q == 4: q = 5
+    elif q == 0: q = 2
+
+    
+    if b == 2: b = 0
+    # elif b == 6: b = 3
+    print('b', b)
 
     if dir == 0: #down
-        s = setsq(state, x, y+1, 3)
+        s = setsq(state, x, y+2, q)
+        s = setsq(state, x, y+1, b)
         s = setsq(state, x, y, c)
     elif dir == 1: #right
-        s = setsq(state, x+1, y, 3)
+        s = setsq(state, x+2, y, q)
+        s = setsq(state, x+1, y, b)
         s = setsq(state, x, y, c)
     elif dir == 2: #up
-        s = setsq(state, x, y-1, 3)
+        s = setsq(state, x, y-2, q)
+        s = setsq(state, x, y-1, b)
         s = setsq(state, x, y, c)
     elif dir == 3: #left
-        s = setsq(state, x-1, y, 3)
+        s = setsq(state, x-2, y, q)
+        s = setsq(state, x-1, y, b)
         s = setsq(state, x, y, c)
     return s
 
-def makemove(state, dir, x, y):
+def makemove(state, dir, x, y, c):
     s = None
-    c = 0
+    d = 0
 
+    if c == 4: c = 6
+    else: c = 3
+
+    m = getsq(state, x, y)
+    if m == 6: 
+        c = 3
+        d = 4
     if dir == 0: #down
-        s = setsq(state, x, y+1, 3)
-        s = setsq(state, x, y, c)
+        s = setsq(state, x, y+1, c)
+        s = setsq(state, x, y, d)
     elif dir == 1: #right
-        s = setsq(state, x+1, y, 3)
-        s = setsq(state, x, y, c)
+        s = setsq(state, x+1, y, c)
+        s = setsq(state, x, y, d)
     elif dir == 2: #up
-        s = setsq(state, x, y-1, 3)
-        s = setsq(state, x, y, c)
+        s = setsq(state, x, y-1, c)
+        s = setsq(state, x, y, d)
     elif dir == 3: #left
-        s = setsq(state, x-1, y, 3)
-        s = setsq(state, x, y, c)
+        s = setsq(state, x-1, y, c)
+        s = setsq(state, x, y, d)
+    else: print('invalid move')
     return s
 
 
@@ -295,18 +342,23 @@ def printState(state, printer=True):
         t = ''
         for i in l:
             t += square(i).char + ' '
+            # t += str(i) + ' '
         if(printer): print(t)
         p.append(t)
     return p
 
+# a playable game loop for testing
 def gameloop(state):
     s = state
     while True:
         # s = state
         printState(s)
-        if goal(state): print('You did it.')
+        if goal(state): 
+            print('You did it.')
+            break
         d = input('enter a direction: ')
-        d = int(d)
+        if len(d) > 0:
+           d = int(d)
         print(d)
         t = trymove(state, d)
         if t != None: s = t
@@ -329,13 +381,18 @@ s = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,0 ,4 ,0 ,4 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
 
+# some easy test levels
+ss = [
+[1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+[1 ,0 ,2 ,4 ,0 ,4 ,2 ,3 ,1],
+[1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1]
+]
 
-ss = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
-[1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
-[1 ,0 ,0 ,0 ,0 ,0 ,2 ,3 ,1],
-[1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
-[1 ,0 ,4 ,0 ,4 ,1 ,0 ,0 ,1],
-[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
+sss = [
+[1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+[1 ,0 ,4 ,2 ,3 ,2 ,4 ,0 ,1],
+[1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1]
+]
 
 # goal test
 gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
@@ -344,10 +401,13 @@ gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,0 ,1 ,0 ,0 ,1 ,0 ,0 ,1],
 [1 ,0 ,5 ,0 ,5 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
-  
-# path = MyPath(ss)
-# printState(path.state)
-# astar(path.state, goal, msuccessors, cost, rcost)
 
-gameloop(s)
+game = True
+path = MyPath(ss)
+
+if not game:
+    printState(path.state)
+    astar(path.state, goal, msuccessors, cost, rcost)
+else:
+    gameloop(path.state)
 
