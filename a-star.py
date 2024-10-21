@@ -165,8 +165,20 @@ def hUID(state):
 
 #goal test #1
 def goal(state):
-    print('goal')
-    return False
+    print('goal test')
+    #if box/goal > 0 and goal/keeper == 0 and box == goal == 0
+    # and keeper == 1 assuming goals == boxes then gameover! win.
+    a = [0] * 5
+    for l in state:
+        for i in l:
+            if i == 5: a[0] +=1
+            elif i == 6: a[1] += 1
+            elif i == 2: a[2] += 1
+            elif i == 4: a[3] += 1
+            elif i == 3: a[4] += 1
+    print(a)
+    return  a[0] > 0 and a[1] == 0 and a[2] == 0 and a[3] == 0 and a[4] == 1
+    
 
 #next-states #2
 def msuccessors(state):
@@ -184,9 +196,22 @@ def setsq(state, r, c, v):
     return s
 
 def trymove(state, dir):
-     for l in state:
-        for i in l:
-            if i != 4: n += 1
+    x, y = findme(state)
+    c = getsq(state, x, y)
+    if c == 0 or c == 4:
+        makemove(dir, x, y)
+
+def makemove(state, dir, x, y):
+    if dir == 0: #down
+        s = setsq(state, x, y+1)
+    elif dir == 1: #right
+        s = setsq(state, x+1, y)
+    elif dir == 2: #up
+        s = setsq(state, x, y-1)
+    elif dir == 3: #left
+        s = setsq(state, x-1, y)
+    return state
+
 
 def findme(state):
     x = -1
@@ -224,13 +249,21 @@ s = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,0 ,4 ,0 ,4 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
 
+# goal test
+gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
+[1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
+[1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+[1 ,0 ,1 ,0 ,0 ,1 ,0 ,0 ,1],
+[1 ,0 ,5 ,0 ,5 ,1 ,3 ,0 ,1],
+[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
+
 g = ['.'] 
 # goal = MyPath(g)
 path = MyPath(s)
 one = h1(path.state)
 print(one)
-printState(s)
-# astar(path.state, goal, msuccessors, cost, rcost)
+printState(path.state)
+astar(path.state, goal, msuccessors, cost, rcost)
 
 
 
