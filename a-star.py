@@ -97,7 +97,6 @@ def astar(start_state, goal_p, successors, cost_fn, remaining_cost_fn):
         my_path = open_list.remove()
         state = my_path.state
         new_val = my_path.total_cost
-        print(state, type(state))
         hash_val = closed_list.hash_fn(state)
         closed_val = closed_list.get(state)
         if not closed_val or new_val < closed_val:
@@ -135,13 +134,13 @@ class square:
 
 
 def cost(s1, s2):
-    print('cost fun', s1, s2)
+    # print('cost fun', s1, s2)
     return 1
 
 r = 90
 def rcost(state):
     global r
-    print('rcost', state, r)
+    # print('rcost', state, r)
     r -= 1
 
     return r if r > 0 else 0
@@ -165,10 +164,10 @@ def hUID(state):
 
 #goal test #1
 def goal(state):
-    print('goal test')
+    # print('goal test')
     #if box/goal > 0 and goal/keeper == 0 and box == goal == 0
     # and keeper == 1 assuming goals == boxes then gameover! win.
-    a = [0] * 5
+    a = [0] * 5 
     for l in state:
         for i in l:
             if i == 5: a[0] +=1
@@ -176,14 +175,23 @@ def goal(state):
             elif i == 2: a[2] += 1
             elif i == 4: a[3] += 1
             elif i == 3: a[4] += 1
-    print(a)
+    # print(a)
     return  a[0] > 0 and a[1] == 0 and a[2] == 0 and a[3] == 0 and a[4] == 1
     
 
 #next-states #2
 def msuccessors(state):
-    print('successors', state)
-    return MyPath(state).states()
+    print('successors')
+    printState(state)
+    s = []  #4 directions
+    for i in range(4):
+        t = trymove(state, i)
+        # print(i, t)
+        if t != None: 
+            s.append(t)
+            printState(t)
+    # print(s)
+    return s
 
 #suggested helper functions
 def getsq(state, r, c):
@@ -197,20 +205,52 @@ def setsq(state, r, c, v):
 
 def trymove(state, dir):
     x, y = findme(state)
-    c = getsq(state, x, y)
+    c = checksq(state, dir)
     if c == 0 or c == 4:
-        makemove(dir, x, y)
+        return makemove(state, dir, x, y)
+    elif c == 2 or c == 5:
+        if checkpush(state,dir):
+            return makemove(state, dir, x, y)
+    return None
+
+def checksq(state, dir):
+    x, y = findme(state)
+    # print('starting at:', x, y)
+    # check the other side of the box
+    if dir == 0: y += 1
+    elif dir == 1: x += 1
+    elif dir == 2: y -= 1
+    elif dir == 3: x -= 1
+    # print('checking: ', x, y)
+    return getsq(state, x, y)
+
+def checkpush(state, dir):
+    x, y = findme(state)
+    # check the other side of the box
+    if dir == 0: y += 2
+    elif dir == 1: x += 2
+    elif dir == 2: y -= 2
+    elif dir == 3: x -= 2
+    return getsq(state, x,y) == 0
+
 
 def makemove(state, dir, x, y):
+    s = None
+    c = 0
+
     if dir == 0: #down
-        s = setsq(state, x, y+1)
+        s = setsq(state, x, y+1, 3)
+        s = setsq(state, x, y, c)
     elif dir == 1: #right
-        s = setsq(state, x+1, y)
+        s = setsq(state, x+1, y, 3)
+        s = setsq(state, x, y, c)
     elif dir == 2: #up
-        s = setsq(state, x, y-1)
+        s = setsq(state, x, y-1, 3)
+        s = setsq(state, x, y, c)
     elif dir == 3: #left
-        s = setsq(state, x-1, y)
-    return state
+        s = setsq(state, x-1, y, 3)
+        s = setsq(state, x, y, c)
+    return s
 
 
 def findme(state):
@@ -256,13 +296,11 @@ gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,0 ,1 ,0 ,0 ,1 ,0 ,0 ,1],
 [1 ,0 ,5 ,0 ,5 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
-
-g = ['.'] 
-# goal = MyPath(g)
+ 
 path = MyPath(s)
-one = h1(path.state)
-print(one)
-printState(path.state)
+# one = h1(path.state)
+# print(one)
+# printState(path.state)
 astar(path.state, goal, msuccessors, cost, rcost)
 
 
