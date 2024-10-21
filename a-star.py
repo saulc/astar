@@ -143,7 +143,8 @@ def rcost(state):
     # print('rcost', state, r)
     r -= 1
 
-    return r if r > 0 else 0
+    # return r if r > 0 else 0
+    return h1(state)
 
 #h0
 def h0(state):
@@ -189,13 +190,16 @@ def msuccessors(state):
         # print(i, t)
         if t != None: 
             s.append(t)
+            print(i)
             printState(t)
     # print(s)
     return s
 
 #suggested helper functions
 def getsq(state, r, c):
-    if r >= len(state) or c >= len(state[r]): return 1
+    if r >= len(state) or c >= len(state[r]): 
+        print('out of bounds, return wall value')
+        return 1
     return state[r][c]
 
 def setsq(state, r, c, v):
@@ -205,34 +209,56 @@ def setsq(state, r, c, v):
 
 def trymove(state, dir):
     x, y = findme(state)
-    c = checksq(state, dir)
+    c = checksq(state, dir, x, y)
+    # print('checking: ', x, y, c)
     if c == 0 or c == 4:
         return makemove(state, dir, x, y)
     elif c == 2 or c == 5:
-        if checkpush(state,dir):
-            return makemove(state, dir, x, y)
+        if checkpush(state,dir, x, y):
+            print('moving box')
+            return push(state, dir, x, y, c)
     return None
 
-def checksq(state, dir):
-    x, y = findme(state)
-    # print('starting at:', x, y)
-    # check the other side of the box
-    if dir == 0: y += 1
-    elif dir == 1: x += 1
-    elif dir == 2: y -= 1
-    elif dir == 3: x -= 1
-    # print('checking: ', x, y)
-    return getsq(state, x, y)
+def checksq(state, dir, x, y): 
+    print('starting at:', x, y, dir) 
+    a = x
+    b = y
+    # print(type(dir))
+    if dir == 0: b += 1
+    elif dir == 1: a += 1
+    elif dir == 2: b -= 1
+    elif dir == 3: a -= 1
+    else: print('direction invalid')
+    print('checking: ', a, b)
+    return getsq(state, a, b)
 
-def checkpush(state, dir):
-    x, y = findme(state)
+def checkpush(state, dir, x, y): 
     # check the other side of the box
     if dir == 0: y += 2
     elif dir == 1: x += 2
     elif dir == 2: y -= 2
     elif dir == 3: x -= 2
-    return getsq(state, x,y) == 0
+    q = getsq(state, x,y) 
+    print('checkpush', q==0)
+    # only push a box if the space is empty or a goal.
+    return q == 0 or q == 4
 
+def push(state, dir, x, y, c):
+    s = None 
+
+    if dir == 0: #down
+        s = setsq(state, x, y+1, 3)
+        s = setsq(state, x, y, c)
+    elif dir == 1: #right
+        s = setsq(state, x+1, y, 3)
+        s = setsq(state, x, y, c)
+    elif dir == 2: #up
+        s = setsq(state, x, y-1, 3)
+        s = setsq(state, x, y, c)
+    elif dir == 3: #left
+        s = setsq(state, x-1, y, 3)
+        s = setsq(state, x, y, c)
+    return s
 
 def makemove(state, dir, x, y):
     s = None
@@ -259,7 +285,7 @@ def findme(state):
     for i in range(len(state)):
         for j in range(len(state[i])):
             c = getsq(state, i, j)
-            if c == 3:
+            if c == 3 or c == 6:
                 return i, j
 
 
@@ -272,6 +298,20 @@ def printState(state, printer=True):
         if(printer): print(t)
         p.append(t)
     return p
+
+def gameloop(state):
+    s = state
+    while True:
+        # s = state
+        printState(s)
+        if goal(state): print('You did it.')
+        d = input('enter a direction: ')
+        d = int(d)
+        print(d)
+        t = trymove(state, d)
+        if t != None: s = t
+        else: print('invalid move')
+
 
 # data = [None] * 5001
 # print('test')
@@ -289,6 +329,14 @@ s = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,0 ,4 ,0 ,4 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
 
+
+ss = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
+[1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
+[1 ,0 ,0 ,0 ,0 ,0 ,2 ,3 ,1],
+[1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
+[1 ,0 ,4 ,0 ,4 ,1 ,0 ,0 ,1],
+[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
+
 # goal test
 gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
@@ -296,12 +344,10 @@ gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,0 ,1 ,0 ,0 ,1 ,0 ,0 ,1],
 [1 ,0 ,5 ,0 ,5 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
- 
-path = MyPath(s)
-# one = h1(path.state)
-# print(one)
+  
+# path = MyPath(ss)
 # printState(path.state)
-astar(path.state, goal, msuccessors, cost, rcost)
+# astar(path.state, goal, msuccessors, cost, rcost)
 
-
+gameloop(s)
 
