@@ -268,24 +268,27 @@ def push(state,  dd, x, y, c, q):
     printState(s)
     b = 3
     m = getsq(s, x, y)
-    if c == 5: 
-        b = 6
+
+    print(c, b, q)
+    if c == 5:  #box in a goal in the direction of move
+        b = 6   #keeper move into goal
         if m == 3: c = 0
-        elif m == 5: c = 4
+        elif m == 6: 
+            c = 4
+            b = 6
     elif c == 6: c = 4
     else: c = 0
 
-
-    if m == 6: 
-        # q = 0
-        b = 6 if b == 4 else 3
-        c = 4
-
+    # a goal on the other side of a box.
     if q == 4: q = 5
-    elif q == 0: q = 2
+    elif q == 0: #or a blank space
+        q = 2
+        if m == 6: c = 4
+        # b = 3
 
+   
     
-    if b == 2: b = 0
+    # if b == 2 : b = 0
     # elif b == 6: b = 3
     # print('b', b)
 
@@ -414,7 +417,7 @@ s = [
 # some easy test levels
 ss = [
 [1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
-[1 ,0 ,2 ,4 ,0 ,4 ,2 ,3 ,1],
+[1 ,0 ,0 ,4 ,4 ,4 ,2 ,3 ,1],
 [1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1]
 ]
 
@@ -432,8 +435,8 @@ gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,0 ,5 ,0 ,5 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
 
-game = True 
-path = MyPath(s)
+game = False 
+path = MyPath(ss)
 
 # msuccessors(s)
 if not game:
