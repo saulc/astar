@@ -192,7 +192,8 @@ def msuccessors(state):
         if t != None: 
             s.append(t)
             # print(i)
-            printState(t)
+            # printState(t)
+    printStates(s)
     # print(s)
     return s
 
@@ -352,6 +353,22 @@ def findme(state):
     print('no keeper found')
     return -1, -1
 
+def printStates(states):
+    if len(states) < 1: return None
+
+    r = []
+    s = []
+    for i in states:
+        t = printState(i, False)
+        s.append(t)
+
+    for i in range(len(s[0])):
+        t = ''
+        for k in range(len(states)):
+            t += s[k][i] + '   '
+        r.append(t)
+        print(t)
+    return r
 
 def printState(state, printer=True):
     p = []
@@ -405,6 +422,14 @@ def gameloop(state):
 # [1 ,0 ,4 ,0 ,4 ,1 ,3 ,0 ,1],
 # [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
 
+s2 = [
+[1  ,1  ,1  ,1  ,1],
+[1  ,0  ,0  ,4  ,1],
+[1  ,0  ,2  ,3  ,1],
+[1  ,0  ,0  ,0  ,1],
+[1  ,0  ,0  ,0  ,1],
+[1  ,1  ,1  ,1  ,1]
+]
 
 s = [
 [0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
@@ -417,7 +442,7 @@ s = [
 # some easy test levels
 ss = [
 [1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
-[1 ,0 ,0 ,4 ,4 ,4 ,2 ,3 ,1],
+[1 ,0 ,0 ,4 ,4 ,0,2 ,3 ,1],
 [1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1]
 ]
 
@@ -436,12 +461,16 @@ gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
 
 game = False 
-path = MyPath(ss)
+path = MyPath(s2)
 
 # msuccessors(s)
 if not game:
     printState(path.state)
     astar(path.state, goal, msuccessors, cost, rcost)
+    # print(path.states())
+    print('Returned path..')
+    for i in path.states():
+        printState(i)
 else:
     gameloop(path.state)
 
