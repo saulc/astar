@@ -1,4 +1,5 @@
 from collections import defaultdict, deque
+from copy import deepcopy
 
 # Priority Queue for the open list
 class PQ:
@@ -183,14 +184,14 @@ def goal(state):
 #next-states #2
 def msuccessors(state):
     print('successors')
-    printState(state)
+    # printState(state) 
     s = []  #4 directions
     for i in range(4):
+        # print(i, type(i), type(t))
         t = trymove(state, i)
-        # print(i, t)
         if t != None: 
             s.append(t)
-            print(i)
+            # print(i)
             printState(t)
     # print(s)
     return s
@@ -203,63 +204,70 @@ def getsq(state, r, c):
     return state[r][c]
 
 def setsq(state, r, c, v):
-    s = state.copy()
+    s = deepcopy(state)
+    # s = state[:]
     s[r][c] = v
     return s
 
-def trymove(state, dir):
+def trymove(state, dd):
+    # print( dd, 'trying move from state: ') 
+    # printState(state)
     x, y = findme(state)
-    c = checksq(state, dir, x, y)
-    print('checking: ', x, y, c)
-    if c == 0 or c == 4:
-        return makemove(state, dir, x, y, c)
+    c = checksq(state,  dd, x, y) 
+    # print('checking: ', x, y, c)
+    if c == 0 or c == 4: 
+        return makemove(state,  dd, x, y, c)
     elif c == 2 or c == 5:
-        p , q = checkpush(state,dir, x, y)
-        print(p, q)
+        p , q = checkpush(state, dd, x, y)
+        # print(p, q)
         if p:
             print('moving box')
-            return push(state, dir, x, y, c, q)
+            return push(state,  dd, x, y, c, q)
+
+    # print('try move failed')
     return None
 
-def checksq(state, dir, x, y): 
-    print('starting at:', x, y, dir) 
+def checksq(state,  dd, x, y): 
+    # print('starting at:', x, y,  dd) 
     a = x
     b = y
-    # print(type(dir))
-    if dir == 0: 
+    # print(type( dd))
+    if  dd == 0: 
         b += 1
-        print('down')
-    elif dir == 1: 
+        # print('right')
+    elif  dd == 1: 
         a += 1
-        print('right')
-    elif dir == 2: 
+        # print('down')
+    elif  dd == 2: 
         b -= 1
-        print('up')
-    elif dir == 3: 
+        # print('left')
+    elif  dd == 3: 
         a -= 1
-        print('left')
+        # print('up')
     else: print('direction invalid')
-    print('checking: ', a, b)
+    # print('checking: ', a, b)
     return getsq(state, a, b)
 
-def checkpush(state, dir, x, y): 
+def checkpush(state,  dd, x, y): 
     # check the other side of the box
     a = x
     b = y 
-    if dir == 0: b += 2
-    elif dir == 1: a += 2
-    elif dir == 2: b -= 2
-    elif dir == 3: a -= 2
+    if  dd == 0: b += 2
+    elif  dd == 1: a += 2
+    elif  dd == 2: b -= 2
+    elif  dd == 3: a -= 2
     q = getsq(state, a,b) 
-    print('checkpush', q)
+    # print('checkpush', q)
     # only push a box if the space is empty or a goal.
     return q == 0 or q == 4 , q
 
-def push(state, dir, x, y, c, q):
+def push(state,  dd, x, y, c, q):
     # moving a box actually has alot of weird cases to deal with
-    s = None 
+    s = state 
+    # print('push')
+    printState(s)
     b = 3
-    m = getsq(state, x, y)
+    m = getsq(s, x, y)
     if c == 5: 
         b = 6
         if m == 3: c = 0
@@ -279,61 +287,67 @@ def push(state, dir, x, y, c, q):
     
     if b == 2: b = 0
     # elif b == 6: b = 3
-    print('b', b)
+    # print('b', b)
 
-    if dir == 0: #down
-        s = setsq(state, x, y+2, q)
-        s = setsq(state, x, y+1, b)
-        s = setsq(state, x, y, c)
-    elif dir == 1: #right
-        s = setsq(state, x+2, y, q)
-        s = setsq(state, x+1, y, b)
-        s = setsq(state, x, y, c)
-    elif dir == 2: #up
-        s = setsq(state, x, y-2, q)
-        s = setsq(state, x, y-1, b)
-        s = setsq(state, x, y, c)
-    elif dir == 3: #left
-        s = setsq(state, x-2, y, q)
-        s = setsq(state, x-1, y, b)
-        s = setsq(state, x, y, c)
+    if  dd == 0: 
+        s = setsq(s, x, y+2, q)
+        s = setsq(s, x, y+1, b)
+        s = setsq(s, x, y, c)
+    elif  dd == 1: 
+        s = setsq(s, x+2, y, q)
+        s = setsq(s, x+1, y, b)
+        s = setsq(s, x, y, c)
+    elif  dd == 2: 
+        s = setsq(s, x, y-2, q)
+        s = setsq(s, x, y-1, b)
+        s = setsq(s, x, y, c)
+    elif  dd == 3: 
+        s = setsq(s, x-2, y, q)
+        s = setsq(s, x-1, y, b)
+        s = setsq(s, x, y, c)
     return s
 
-def makemove(state, dir, x, y, c):
-    s = None
+def makemove(state,  dd, x, y, c):
+    s = state
+    # print('move')
+    # printState(s)
     d = 0
 
+    m = getsq(s, x, y)
     if c == 4: c = 6
     else: c = 3
 
-    m = getsq(state, x, y)
     if m == 6: 
-        c = 3
+        if c != 6:
+            c = 3 
         d = 4
-    if dir == 0: #down
-        s = setsq(state, x, y+1, c)
-        s = setsq(state, x, y, d)
-    elif dir == 1: #right
-        s = setsq(state, x+1, y, c)
-        s = setsq(state, x, y, d)
-    elif dir == 2: #up
-        s = setsq(state, x, y-1, c)
-        s = setsq(state, x, y, d)
-    elif dir == 3: #left
-        s = setsq(state, x-1, y, c)
-        s = setsq(state, x, y, d)
+
+    if  dd == 0: 
+        s = setsq(s, x, y+1, c)
+        s = setsq(s, x, y, d)
+    elif  dd == 1: 
+        s = setsq(s, x+1, y, c)
+        s = setsq(s, x, y, d)
+    elif  dd == 2: 
+        s = setsq(s, x, y-1, c) 
+        s = setsq(s, x, y, d)
+    elif  dd == 3: 
+        s = setsq(s, x-1, y, c)
+        s = setsq(s, x, y, d)
     else: print('invalid move')
+     
+    print('made a move.')
     return s
 
 
 def findme(state):
-    x = -1
-    y = x
     for i in range(len(state)):
         for j in range(len(state[i])):
             c = getsq(state, i, j)
             if c == 3 or c == 6:
                 return i, j
+    print('no keeper found')
+    return -1, -1
 
 
 def printState(state, printer=True):
@@ -350,20 +364,25 @@ def printState(state, printer=True):
 # a playable game loop for testing
 def gameloop(state):
     s = state
+    moves = [s]
     while True:
         # s = state
         printState(s)
-        if goal(state): 
+        if goal(s): 
             print('You did it.')
             break
         d = input('enter a direction: ')
         if len(d) > 0:
            d = int(d)
         print(d)
-        t = trymove(state, d)
-        if t != None: s = t
+        t = trymove(s, d)
+        if t != None: 
+            moves.append(t)
+            s = t
         else: print('invalid move')
 
+    for s in moves:
+        printState(s)
 
 # data = [None] * 5001
 # print('test')
@@ -374,12 +393,23 @@ def gameloop(state):
 # print('data')
 
 # s = [[0,0,0,0,4]]
-s = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
+
+# the test case was not solvable?!
+# s = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
+# [1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
+# [1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
+# [1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
+# [1 ,0 ,4 ,0 ,4 ,1 ,3 ,0 ,1],
+# [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
+
+
+s = [
+[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
 [1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
 [1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
-[1 ,0 ,4 ,0 ,4 ,1 ,3 ,0 ,1],
-[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
+[1 ,0 ,0 ,4 ,4 ,1 ,3 ,0 ,1],
+[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
 
 # some easy test levels
 ss = [
@@ -402,9 +432,10 @@ gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,0 ,5 ,0 ,5 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
 
-game = True
-path = MyPath(ss)
+game = True 
+path = MyPath(s)
 
+# msuccessors(s)
 if not game:
     printState(path.state)
     astar(path.state, goal, msuccessors, cost, rcost)
