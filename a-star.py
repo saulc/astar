@@ -124,7 +124,7 @@ Goal        4  ‘.’
 Box/goal    5  ‘*’
 Keeper/goal 6  ‘+’
 '''
-
+# helper class to convert id to chars
 class square:
     types = ['blank', 'wall', 'box', 'keeper', 'goal', 'box/goal', 'keeper/goal']
     chars = [' ', '#', '$', '@', '.', '*', '+']
@@ -138,20 +138,20 @@ def cost(s1, s2):
     # print('cost fun', s1, s2)
     return 1
 
-r = 90
-def rcost(state):
-    global r
-    # print('rcost', state, r)
-    r -= 1
+#dont' think this will work just replace huristic in astar call.
+# def rcost(state, h):
+#     if h == 0: return h0(state)
+#     elif h == 1: return h1(state)
+#     elif h == 2 return hUID(state)
 
-    # return r if r > 0 else 0
-    return h1(state)
+#     print('invalid huristic, using trivial option.')
+#     return 0
 
-#h0
+#3 h0
 def h0(state):
     return 0
 
-#h1
+#4 h1
 def h1(state):
     n = 0
     for l in state:
@@ -159,9 +159,17 @@ def h1(state):
             if i != 4: n += 1
     return n
 
-# TODO: implement huristic for A*
-def hUID(state):
-    pass
+#5 TODO: implement huristic for A*
+def h303673583(state):
+    n = 0
+    g = 0
+    for l in state:
+        for i in l:
+            if i != 4: n += 1
+            if i == 5: g += 1
+    r = n - g*3
+    # give 'weight' to boxes in goals.
+    return r if r > 0 else 0
 
 
 #goal test #1
@@ -179,17 +187,16 @@ def goal(state):
             elif i == 3 or i == 6: a[4] += 1
     # print(a)
     g =  a[0] > 0 and a[2] == 0 and a[3] == 0 and a[4] == 1
-    print('goal: ', g)
+    # print('goal: ', g)
     return g
     
 
 #next-states #2
 def msuccessors(state):
-    print('current state')
-    printState(state) 
+    # print('current state')
+    # printState(state) 
     s = []  #4 directions
-    for i in range(4):
-        # print(i, type(i), type(t))
+    for i in range(4): 
         t = trymove(state, i)
         if t != None: 
             s.append(t)
@@ -203,18 +210,21 @@ def msuccessors(state):
     return s
 
 #suggested helper functions
+# 1 b
 def getsq(state, r, c):
     if r >= len(state) or c >= len(state[r]) or r < 0 or c < 0: 
         print('out of bounds, return wall value')
         return 1
     return state[r][c]
 
+# 2 b
 def setsq(state, r, c, v):
+    #was stuck for 2 days because of copy instead of deepcopy.
     s = deepcopy(state)
-    # s = state[:]
     s[r][c] = v
     return s
-# 3 check if the direction is possible return the state from that move
+
+# 3 b check if the direction is possible return the state from that move
 def trymove(state, dd):
     # print( dd, 'trying move from state: ') 
     # printState(state)
@@ -319,6 +329,7 @@ def push(state,  dd, x, y, c, q):
         s = setsq(s, x, y, c)
     return s
 
+#a bit of repeated logic between push/makemove but it works... 
 #make a move that is not moving a box
 def makemove(state,  dd, x, y, c):
     s = state
@@ -409,20 +420,23 @@ def gameloop(state):
     moves = [s]
     while True:
         # s = state
+
+        print('--Acme Sokoban--')
         printState(s)
-        printStates(msuccessors(s))
+        # printStates(msuccessors(s))
         if goal(s): 
             print('You did it.')
             break
-        d = input('enter a direction: ')
+        d = input('enter a direction (0-3): ')
         if len(d) > 0:
            d = int(d)
+           if d > 3: print(' 0 - Right, 1 - down, 2 - left, 3 - up')
         print(d)
         t = trymove(s, d)
         if t != None: 
             moves.append(t)
             s = t
-        else: print('invalid move')
+        else: print('invalid move.')
 
     for t in moves:
         printState(t) 
@@ -491,18 +505,20 @@ sss = [
  
 
 game = False 
-path = MyPath(sss)
+path = MyPath(s)
 
 # msuccessors(s)
 if not game:
+    print('--Acme Sokoban Solver--')
+    print('Start State: ')
     printState(path.state)
-    r = astar(path.state, goal, msuccessors, cost, rcost)
+    r = astar(path.state, goal, msuccessors, cost, h303673583)
     # print(path.states())
-    print('Returned ..')
+    # print('Returned ..')
     # for i in r:
     #     printState(i)
-    # TODO: break r into 4s and use printStates
-    
+
+    # break r into 4s and use printState
     printStates(r) 
 
 else:
