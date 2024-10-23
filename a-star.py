@@ -214,7 +214,7 @@ def setsq(state, r, c, v):
     # s = state[:]
     s[r][c] = v
     return s
-
+# 3 check if the direction is possible return the state from that move
 def trymove(state, dd):
     # print( dd, 'trying move from state: ') 
     # printState(state)
@@ -233,6 +233,7 @@ def trymove(state, dd):
     # print('try move failed')
     return None
 
+#check the value of the next sqaure in the direction of dd
 def checksq(state,  dd, x, y): 
     # print('starting at:', x, y,  dd) 
     a = x
@@ -254,6 +255,7 @@ def checksq(state,  dd, x, y):
     # print('checking: ', a, b)
     return getsq(state, a, b)
 
+#found a box, return if it can be moved and what is the other side  
 def checkpush(state,  dd, x, y): 
     # check the other side of the box
     a = x
@@ -267,6 +269,7 @@ def checkpush(state,  dd, x, y):
     # only push a box if the space is empty or a goal.
     return q == 0 or q == 4 , q
 
+#move a box a set the new vaules, return a copy of the state with changes
 def push(state,  dd, x, y, c, q):
     # moving a box actually has alot of weird cases to deal with
     s = state 
@@ -292,7 +295,7 @@ def push(state,  dd, x, y, c, q):
         if m == 6: c = 4
         # b = 3
 
-   
+    #keep track of 3 boxes and make needed changes
     
     # if b == 2 : b = 0
     # elif b == 6: b = 3
@@ -316,6 +319,7 @@ def push(state,  dd, x, y, c, q):
         s = setsq(s, x, y, c)
     return s
 
+#make a move that is not moving a box
 def makemove(state,  dd, x, y, c):
     s = state
     # print('move')
@@ -323,9 +327,11 @@ def makemove(state,  dd, x, y, c):
     d = 0
 
     m = getsq(s, x, y)
+    # if the next square is a global
     if c == 4: c = 6
     else: c = 3
 
+    # if keeper is on a goal
     if m == 6: 
         if c != 6:
             c = 3 
@@ -348,7 +354,7 @@ def makemove(state,  dd, x, y, c):
     # print('made a move.')
     return s
 
-
+#return the location of the keeper
 def findme(state):
     for i in range(len(state)):
         for j in range(len(state[i])):
@@ -358,23 +364,33 @@ def findme(state):
     print('no keeper found')
     return -1, -1
 
-def printStates(states):
+#print the encoded states side by side
+def printStates(states, printer=True):
     if len(states) < 1: return None
-
+     
     r = []
     s = []
-    for i in states:
-        t = printState(i, False)
-        s.append(t)
-
-    for i in range(len(s[0])):
-        t = ''
-        for k in range(len(states)):
-            t += s[k][i] + '   '
-        r.append(t)
-        print(t)
+    i = 0
+    print('solved in: ',len(states), 'steps')
+    while len(states) > i :
+        t = states[i:i+4]  #suprisingly this just works?
+        i+= 4
+        # cut up the list
+        for k in t:
+            a = printState(k, False)
+            s.append(a)
+        # get the encoded version as a list 
+        for z in range(len(s[0])):
+            x = ''
+            # combine each line for each state in list section 4 wide
+            for k in range(len(t)):
+                x += s[k][z] + '   '
+            r.append(x) #save it to return
+            if printer: print(x)
+        if printer: print()
     return r
 
+# print a single encoded state
 def printState(state, printer=True):
     p = []
     for l in state:
@@ -387,6 +403,7 @@ def printState(state, printer=True):
     return p
 
 # a playable game loop for testing
+# returns the states(moves) made
 def gameloop(state):
     s = state
     moves = [s]
@@ -407,9 +424,9 @@ def gameloop(state):
             s = t
         else: print('invalid move')
 
-    for s in moves:
-        printState(s)
-        print()
+    for t in moves:
+        printState(t) 
+    return moves
 
 
 # figuring out the input types for astar
@@ -431,6 +448,23 @@ s2 = [
 [1  ,0  ,0  ,0  ,1],
 [1  ,0  ,0  ,0  ,1],
 [1  ,1  ,1  ,1  ,1]
+]
+
+s3 = [
+[1  ,1  ,1  ,1  ,1],
+[1  ,0  ,0  ,6  ,1],
+[1  ,0  ,2  ,0  ,1],
+[1  ,0  ,0  ,0  ,1],
+[1  ,0  ,0  ,0  ,1],
+[1  ,1  ,1  ,1  ,1] ]
+
+s4 = [
+[1  ,1  ,1  ,1  ,1],
+[1  ,4  ,2  ,0  ,1],
+[1  ,0  ,0  ,0  ,1],
+[1  ,0  ,0  ,0  ,1],
+[1  ,0  ,5  ,3  ,1],
+[1  ,1  ,1  ,1  ,1],
 ]
 
 # p1 example
@@ -457,7 +491,7 @@ sss = [
  
 
 game = False 
-path = MyPath(s)
+path = MyPath(sss)
 
 # msuccessors(s)
 if not game:
@@ -465,9 +499,12 @@ if not game:
     r = astar(path.state, goal, msuccessors, cost, rcost)
     # print(path.states())
     print('Returned ..')
-    for i in r:
-        printState(i)
+    # for i in r:
+    #     printState(i)
     # TODO: break r into 4s and use printStates
+    
+    printStates(r) 
+
 else:
     gameloop(path.state)
 
