@@ -168,7 +168,7 @@ def hUID(state):
 def goal(state):
     # print('goal test')
     #if box/goal > 0 and   goal == 0
-
+    #made the rules too strict at first.
     a = [0] * 5 
     for l in state:
         for i in l:
@@ -178,13 +178,15 @@ def goal(state):
             # elif i == 4: a[3] += 1
             elif i == 3 or i == 6: a[4] += 1
     # print(a)
-    return  a[0] > 0 and a[2] == 0 and a[3] == 0 and a[4] == 1
+    g =  a[0] > 0 and a[2] == 0 and a[3] == 0 and a[4] == 1
+    print('goal: ', g)
+    return g
     
 
 #next-states #2
 def msuccessors(state):
-    print('successors')
-    # printState(state) 
+    print('current state')
+    printState(state) 
     s = []  #4 directions
     for i in range(4):
         # print(i, type(i), type(t))
@@ -193,7 +195,10 @@ def msuccessors(state):
             s.append(t)
             # print(i)
             # printState(t)
-    printStates(s)
+    
+    # print('successors')
+    # printStates(s) 
+    #print the states side by side
     # print(s)
     return s
 
@@ -222,7 +227,7 @@ def trymove(state, dd):
         p , q = checkpush(state, dd, x, y)
         # print(p, q)
         if p:
-            print('moving box')
+            # print('moving box')
             return push(state,  dd, x, y, c, q)
 
     # print('try move failed')
@@ -266,11 +271,11 @@ def push(state,  dd, x, y, c, q):
     # moving a box actually has alot of weird cases to deal with
     s = state 
     # print('push')
-    printState(s)
+    # printState(s)
     b = 3
     m = getsq(s, x, y)
 
-    print(c, b, q)
+    # print(c, b, q)
     if c == 5:  #box in a goal in the direction of move
         b = 6   #keeper move into goal
         if m == 3: c = 0
@@ -340,7 +345,7 @@ def makemove(state,  dd, x, y, c):
         s = setsq(s, x, y, d)
     else: print('invalid move')
      
-    print('made a move.')
+    # print('made a move.')
     return s
 
 
@@ -388,6 +393,7 @@ def gameloop(state):
     while True:
         # s = state
         printState(s)
+        printStates(msuccessors(s))
         if goal(s): 
             print('You did it.')
             break
@@ -403,7 +409,10 @@ def gameloop(state):
 
     for s in moves:
         printState(s)
+        print()
 
+
+# figuring out the input types for astar
 # data = [None] * 5001
 # print('test')
 # print(len(data))
@@ -413,14 +422,7 @@ def gameloop(state):
 # print('data')
 
 # s = [[0,0,0,0,4]]
-
-# the test case was not solvable?!
-# s = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
-# [1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
-# [1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
-# [1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
-# [1 ,0 ,4 ,0 ,4 ,1 ,3 ,0 ,1],
-# [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
+ 
 
 s2 = [
 [1  ,1  ,1  ,1  ,1],
@@ -431,12 +433,13 @@ s2 = [
 [1  ,1  ,1  ,1  ,1]
 ]
 
+# p1 example
 s = [
 [0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
 [1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
 [1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
-[1 ,0 ,0 ,4 ,4 ,1 ,3 ,0 ,1],
+[1 ,0 ,4 ,4 ,0 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
 
 # some easy test levels
@@ -451,26 +454,20 @@ sss = [
 [1 ,0 ,4 ,2 ,3 ,2 ,4 ,0 ,1],
 [1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1]
 ]
-
-# goal test
-gt = [[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
-[1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
-[1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
-[1 ,0 ,1 ,0 ,0 ,1 ,0 ,0 ,1],
-[1 ,0 ,5 ,0 ,5 ,1 ,3 ,0 ,1],
-[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 1]]
+ 
 
 game = False 
-path = MyPath(s2)
+path = MyPath(s)
 
 # msuccessors(s)
 if not game:
     printState(path.state)
-    astar(path.state, goal, msuccessors, cost, rcost)
+    r = astar(path.state, goal, msuccessors, cost, rcost)
     # print(path.states())
-    print('Returned path..')
-    for i in path.states():
+    print('Returned ..')
+    for i in r:
         printState(i)
+    # TODO: break r into 4s and use printStates
 else:
     gameloop(path.state)
 
