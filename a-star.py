@@ -385,10 +385,9 @@ def printStates(states, printer=True):
     print('solved in: ',len(states), 'steps')
     while len(states) > i :
 
-        s = [] #reset!!! lost an hour for placing out of loop.
         t = states[i:i+4]  #suprisingly this just works?
         
-        # print(i, len(t))
+        s = [] #reset!!! lost an hour for placing out of loop.
         i += 4
         # cut up the list
         for k in t:
@@ -443,8 +442,9 @@ def gameloop(state):
             s = t
         else: print('invalid move.')
 
-    for t in moves:
-        printState(t) 
+    printStates(moves)
+    # for t in moves:
+    #     printState(t) 
     return moves
 
 
@@ -495,6 +495,15 @@ s = [
 [1 ,0 ,4 ,4 ,0 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
 
+# slighty differnt example(goal moved) with surprising moves/solution
+s = [
+[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
+[1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
+[1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
+[1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
+[1 ,0 ,0 ,4 ,4 ,1 ,3 ,0 ,1],
+[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
+
 # some easy test levels
 ss = [
 [1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
@@ -508,24 +517,23 @@ sss = [
 [1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1]
 ]
  
-
+# set to True to play the game
+# False to run astar and show the solution
 game = False 
-path = MyPath(s)
+
+#just store the state (gameboard) to start with
+start = s
 
 # msuccessors(s)
 if not game:
     print('--Acme Sokoban Solver--')
     print('Start State: ')
-    printState(path.state)
-    r = astar(path.state, goal, msuccessors, cost, h1)
-    # print(path.states())
-    # print('Returned ..')
-    # for i in r:
-    #     printState(i)
+    printState(start)
+    r = astar(start, goal, msuccessors, cost, h1)
 
     # break r into 4s and use printState
     printStates(r) 
 
 else:
-    gameloop(path.state)
+    gameloop(start)
 
