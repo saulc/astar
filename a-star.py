@@ -175,7 +175,8 @@ def h303673583(state):
 #goal test #1
 def goal(state):
     # print('goal test')
-    #if box/goal > 0 and   goal == 0
+    #if box/goal > 0 and   boxes == 0 and keeper exists
+    # since goals != boxes
     #made the rules too strict at first.
     a = [0] * 5 
     for l in state:
@@ -186,7 +187,7 @@ def goal(state):
             # elif i == 4: a[3] += 1
             elif i == 3 or i == 6: a[4] += 1
     # print(a)
-    g =  a[0] > 0 and a[2] == 0 and a[3] == 0 and a[4] == 1
+    g =  a[0] > 0 and a[2] == 0 and a[4] == 1
     # print('goal: ', g)
     return g
     
@@ -380,21 +381,25 @@ def printStates(states, printer=True):
     if len(states) < 1: return None
      
     r = []
-    s = []
     i = 0
     print('solved in: ',len(states), 'steps')
     while len(states) > i :
+
+        s = [] #reset!!! lost an hour for placing out of loop.
         t = states[i:i+4]  #suprisingly this just works?
-        i+= 4
+        
+        # print(i, len(t))
+        i += 4
         # cut up the list
         for k in t:
             a = printState(k, False)
             s.append(a)
+
         # get the encoded version as a list 
         for z in range(len(s[0])):
             x = ''
             # combine each line for each state in list section 4 wide
-            for k in range(len(t)):
+            for k in range(len(t)): 
                 x += s[k][z] + '   '
             r.append(x) #save it to return
             if printer: print(x)
@@ -512,7 +517,7 @@ if not game:
     print('--Acme Sokoban Solver--')
     print('Start State: ')
     printState(path.state)
-    r = astar(path.state, goal, msuccessors, cost, h303673583)
+    r = astar(path.state, goal, msuccessors, cost, h1)
     # print(path.states())
     # print('Returned ..')
     # for i in r:
