@@ -175,21 +175,31 @@ def h303673583(state):
 #goal test #1
 def goal(state):
     # print('goal test')
-    #if box/goal > 0 and   boxes == 0 and keeper exists
+    #if box/goal >= min(boxes, goals)  and keeper exists
+    # since these counts should never change
+    # just be sure to count goals with boxes or keeper
     # since goals != boxes
     #made the rules too strict at first.
-    a = [0] * 5 
+    b = 0
+    g = 0
+    k = 0
+    x = 0  #boxes in a goal.!
     for l in state:
         for i in l:
-            if i == 5: a[0] +=1
-            # elif i == 6: a[1] += 1
-            elif i == 2: a[2] += 1
-            # elif i == 4: a[3] += 1
-            elif i == 3 or i == 6: a[4] += 1
+            if i == 5: 
+                x += 1
+                b +=1  #box in a goal. one of each
+                g +=1
+            elif i == 6: #keeper in a goal
+                g += 1
+                k += 1
+            elif i == 2: b += 1     #box 
+            elif i == 3: k += 1     #keeper
+            elif i == 4: g += 1     #goal
     # print(a)
-    g =  a[0] > 0 and a[2] == 0 and a[4] == 1
-    # print('goal: ', g)
-    return g
+    t =  x >= min(b, g) and k == 1
+    # print('goal: ', x, b, g, k, min(b,g))
+    return t
     
 
 #next-states #2
@@ -520,6 +530,8 @@ sss = [
 game = False 
 
 #just store the state (gameboard) to start with
+# a box of walls is not required but looks better.
+# boxes != goals works in both directions.
 start = s
 
 # msuccessors(s)
