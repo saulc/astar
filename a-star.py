@@ -209,6 +209,9 @@ def msuccessors(state):
     s = []  #4 directions
     for i in range(4): 
         t = trymove(state, i)
+        if t == -1: 
+            # print('no keeper...')
+            return s
         if t != None: 
             s.append(t)
             # print(i)
@@ -240,6 +243,9 @@ def trymove(state, dd):
     # print( dd, 'trying move from state: ') 
     # printState(state)
     x, y = findme(state)
+    # no keeper, an invalid game.
+    if x == -1 and y == -1: return -1
+
     c = checksq(state,  dd, x, y) 
     # print('checking: ', x, y, c)
     if c == 0 or c == 4: 
@@ -388,7 +394,7 @@ def findme(state):
 
 #print the encoded states side by side
 def printStates(states, printer=True):
-    if len(states) < 1: return None
+    if states == None: return None
      
     r = []
     i = 0
@@ -495,12 +501,12 @@ s4 = [
 ]
 
 # p1 example
-s = [
+p1 = [
 [0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
 [1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
 [1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
 [1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
-[1 ,0 ,4 ,4 ,0 ,1 ,3 ,0 ,1],
+[1 ,0 ,4 ,4 ,0 ,1 ,0 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
 
 # slighty differnt example(goal moved) with surprising moves/solution
@@ -510,6 +516,15 @@ s = [
 [1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
 [1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
 [1 ,0 ,0 ,4 ,4 ,1 ,3 ,0 ,1],
+[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
+
+# keeper starts in the 3rd goal.
+sk = [
+[0 ,0 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
+[1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
+[1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
+[1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
+[1 ,0 ,0 ,4 ,4 ,1 ,6 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
 
 # some easy test levels
@@ -540,7 +555,7 @@ if not game:
     print('Start State: ')
     printState(start)
     r = astar(start, goal, msuccessors, cost, h1) #set the huristic as last argument
-
+    if r == None: print('No Solution.')
     # break r into 4s and use printState
     printStates(r) 
 
