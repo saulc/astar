@@ -411,10 +411,10 @@ def printState(state, printer=True):
     for l in state:
         t = ''
         for i in l:
-            t += square(i).char + ' '
+            t += square(i).char  + ' '
             # t += str(i) + ' '
         if(printer): print(t)
-        p.append(t)
+        p.append(t)  #return a list of lines to conbine states later.
     return p
 
 # a playable game loop for testing
@@ -442,9 +442,7 @@ def gameloop(state):
             s = t
         else: print('invalid move.')
 
-    printStates(moves)
-    # for t in moves:
-    #     printState(t) 
+    printStates(moves) 
     return moves
 
 
@@ -529,7 +527,7 @@ if not game:
     print('--Acme Sokoban Solver--')
     print('Start State: ')
     printState(start)
-    r = astar(start, goal, msuccessors, cost, h1)
+    r = astar(start, goal, msuccessors, cost, h1) #set the huristic as last argument
 
     # break r into 4s and use printState
     printStates(r) 
