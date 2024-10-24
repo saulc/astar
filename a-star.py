@@ -425,11 +425,13 @@ def printStates(states, printer=True):
 
 # print a single encoded state
 def printState(state, printer=True):
+    w = len(state[0]) < 10
     p = []
     for l in state:
         t = ''
         for i in l:
-            t += square(i).char  + ' '
+            t += square(i).char  
+            if w: t += ' '
             # t += str(i) + ' '
         if(printer): print(t)
         p.append(t)  #return a list of lines to conbine states later.
@@ -529,6 +531,15 @@ sk = [
 [1 ,0 ,0 ,4 ,4 ,1 ,6 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
 
+# a larger game board
+l = [
+[0 ,0 ,1 ,1 ,1 ,1 ,1 ,0 ,0 ,0],
+[1 ,1 ,1 ,0 ,0 ,0 ,1 ,1 ,1 ,1],
+[1 ,0 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
+[1 ,0 ,1 ,0 ,0 ,0 ,1 ,2 ,0 ,1],
+[1 ,0 ,0 ,4 ,0 ,4 ,1 ,6 ,0 ,1],
+[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
+
 # some easy test levels
 ss = [
 [1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
@@ -547,6 +558,7 @@ sss = [
 game = False 
 
 #just store the state (gameboard) to start with
+# all rows should be the same length, not checked.
 # a box of walls is not required but looks better.
 # boxes != goals works in both directions.
 start = s
