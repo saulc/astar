@@ -415,10 +415,12 @@ def printStates(states, printer=True):
             x = ''
             # combine each line for each state in list section 4 wide
             for k in range(len(t)): 
-                x += s[k][z] + '   '
+                x += s[k][z] + '  '
             r.append(x) #save it to return
             if printer: print(x)
         if printer: print()
+
+    print('solved in: ',len(states), 'steps')
     return r
 
 # print a single encoded state
