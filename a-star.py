@@ -114,6 +114,10 @@ def astar(start_state, goal_p, successors, cost_fn, remaining_cost_fn):
 
 # The rest of the code for testing and other purposes would go here
 
+#   Saul Castro
+#   hw1 - Sokoban
+#   10/18/24
+
 '''
 Content Integer ASCII
 Blank       0  ‘ ‘  (space)
@@ -124,6 +128,7 @@ Goal        4  ‘.’
 Box/goal    5  ‘*’
 Keeper/goal 6  ‘+’
 '''
+
 # helper class to convert id to chars
 class square:
     types = ['blank', 'wall', 'box', 'keeper', 'goal', 'box/goal', 'keeper/goal']
@@ -159,7 +164,7 @@ def h1(state):
             if i != 4: n += 1
     return n
 
-#5 TODO: implement huristic for A*
+#5 implement huristic for A*
 def h303673583(state):
     n = 0
     g = 0
@@ -173,7 +178,7 @@ def h303673583(state):
 
 
 #goal test #1
-def goal(state):
+def goal_test(state):
     # print('goal test')
     #if box/goal >= min(boxes, goals)  and keeper exists
     # since these counts should never change
@@ -203,7 +208,7 @@ def goal(state):
     
 
 #next-states #2
-def msuccessors(state):
+def next_states(state):
     # print('current state')
     # printState(state) 
     s = []  #4 directions
@@ -510,7 +515,7 @@ p1 = [
 [1 ,1 ,1 ,0 ,0 ,1 ,1 ,1 ,1],
 [1 ,0 ,0 ,0 ,0 ,0 ,2 ,0 ,1],
 [1 ,0 ,1 ,0 ,0 ,1 ,2 ,0 ,1],
-[1 ,0 ,4 ,4 ,0 ,1 ,0 ,0 ,1],
+[1 ,0 ,4 ,4 ,0 ,1 ,3 ,0 ,1],
 [1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1] ]
 
 # slighty differnt example(goal moved) with surprising moves/solution
@@ -561,14 +566,14 @@ game = False
 # all rows should be the same length, not checked.
 # a box of walls is not required but looks better.
 # boxes != goals works in both directions.
-start = s
+start = p1
 
 # msuccessors(s)
 if not game:
     print('--Acme Sokoban Solver--')
     print('Start State: ')
     printState(start)
-    r = astar(start, goal, msuccessors, cost, h1) #set the huristic as last argument
+    r = astar(start, goal_test, next_states, cost, h1) #set the huristic as last argument
     if r == None: print('No Solution.')
     # break r into 4s and use printState
     printStates(r) 
