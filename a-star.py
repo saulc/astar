@@ -453,7 +453,7 @@ def gameloop(state):
         print('--Acme Sokoban--')
         printState(s)
         # printStates(msuccessors(s))
-        if goal(s): 
+        if goal_test(s): 
             print('You did it.')
             break
         d = input('enter a direction (0-3): ')
@@ -560,7 +560,7 @@ sss = [
  
 # set to True to play the game
 # False to run astar and show the solution
-game = False 
+game = True 
 
 #just store the state (gameboard) to start with
 # all rows should be the same length, not checked.
